@@ -1,0 +1,58 @@
+/* src/styles.css */
+
+/* Fondo general */
+body {
+    background: linear-gradient(135deg, #e0eafc, #cfdef3);
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+/* Contenedor del formulario */
+form {
+    animation: fadeIn 0.6s ease-in-out;
+}
+
+/* Encabezado */
+h1 {
+    color: #2c3e50;
+}
+
+/* Inputs */
+input[type="text"],
+input[type="password"] {
+    border: 1px solid #ccc;
+    transition: border-color 0.3s ease;
+}
+
+input[type="text"]:focus,
+input[type="password"]:focus {
+    border-color: #3498db;
+    outline: none;
+    box-shadow: 0 0 0 1px #3498db;
+}
+
+/* Botón */
+button[type="submit"] {
+    background-color: #3498db;
+    transition: background-color 0.3s ease;
+}
+
+button[type="submit"]:hover {
+    background-color: #2980b9;
+}
+
+/* Mensaje de error */
+#errorMsg {
+    font-weight: bold;
+}
+
+/* Animación */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-15px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
