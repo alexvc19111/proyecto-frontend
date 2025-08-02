@@ -30,8 +30,8 @@ const AgendaMedica = () => {
             } catch (error) {
                 console.error('Error al obtener el médico:', error);
             }
-            
-            
+
+
         };
 
         obtenerIdMedico();
@@ -45,19 +45,47 @@ const AgendaMedica = () => {
         const obtenerAgenda = async () => {
             try {
                 const { data } = await axios.get(`/agenda/medico/${medicoId}`);
-                const ordenDias = ['lunes', 'martes', 'miércoles', 'jueves', 'viernes', 'sábado', 'domingo'];
 
-                const agendaOrdenada = data.sort((a, b) => {
-                    return ordenDias.indexOf(a.dia_semana.toLowerCase()) - ordenDias.indexOf(b.dia_semana.toLowerCase());
-                });
+                if (data.length === 0) {
+                    console.log("No hay agenda. Creando por defecto...");
+                    await crearAgendaPorDefecto(medicoId);
+                    const { data: nuevaAgenda } = await axios.get(`/agenda/medico/${medicoId}`);
+                    setAgenda(nuevaAgenda);
+                } else {
+                    const ordenDias = ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado', 'Domingo'];
 
-                setAgenda(agendaOrdenada);
-                setAgenda(data);
+                    const agendaOrdenada = data.sort((a, b) => {
+                        return ordenDias.indexOf(a.dia_semana.toLowerCase()) - ordenDias.indexOf(b.dia_semana.toLowerCase());
+                    });
+
+                    setAgenda(agendaOrdenada);
+                }
+
             } catch (error) {
                 console.error('Error al obtener la agenda:', error);
             }
             setLoading(false);
         };
+        const crearAgendaPorDefecto = async (medicoId) => {
+            const dias = ['Lunes', 'Martes', 'Miercoles', 'Jueves', 'Viernes'];
+
+            for (const dia of dias) {
+                await axios.post('/agenda', {
+                    medico_id: medicoId,
+                    dia_semana: dia,
+                    hora_inicio: '08:00',
+                    hora_fin: '16:00',
+                    almuerzo_inicio: '12:00',
+                    almuerzo_fin: '13:00',
+                }, {
+                    headers: {
+                        Authorization: `Bearer ${localStorage.getItem('token')}`
+                    }
+                });
+            }
+        };
+
+
 
         obtenerAgenda();
     }, [medicoId]);
@@ -121,6 +149,7 @@ const AgendaMedica = () => {
 
             setAgenda(actualizada);
             setEditingId(null);
+
         } catch (error) {
             if (error.response && error.response.status === 422) {
                 const errores = error.response.data.errors;
@@ -145,113 +174,113 @@ const AgendaMedica = () => {
                         <span className="ml-4 text-blue-700 font-medium">Cargando agenda...</span>
                     </div>
                 ) : (
-                <div className="overflow-x-auto">
-                    <table className="min-w-full bg-white border border-gray-200 rounded-xl shadow-sm">
-                        <thead>
-                            <tr className="bg-gray-100 text-gray-700 text-sm uppercase tracking-wider">
-                                <th className="px-6 py-3 text-left">Día</th>
-                                <th className="px-6 py-3 text-left">Hora Inicio</th>
-                                <th className="px-6 py-3 text-left">Hora Fin</th>
-                                <th className="px-6 py-3 text-left">Almuerzo Inicio</th>
-                                <th className="px-6 py-3 text-left">Almuerzo Fin</th>
-                                <th className="px-6 py-3 text-left">Acciones</th>
-                            </tr>
-                        </thead>
-
-                        <tbody className="text-gray-700 text-sm">
-                            {agenda.map((item) => (
-                                <tr key={item.id} className="border-t hover:bg-gray-50 transition">
-                                    <td className="px-6 py-4">{item.dia_semana}</td>
-
-                                    <td className="px-6 py-4">
-                                        {editingId === item.id ? (
-                                            <input
-                                                type="time"
-                                                name="hora_inicio"
-                                                value={horas[item.id]?.hora_inicio || ''}
-                                                onChange={(e) => handleChange(e, item.id)}
-                                                className="border border-gray-300 rounded-md px-2 py-1 w-full focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                            />
-                                        ) : (
-                                            item.hora_inicio
-                                        )}
-                                    </td>
-
-                                    <td className="px-6 py-4">
-                                        {editingId === item.id ? (
-                                            <input
-                                                type="time"
-                                                name="hora_fin"
-                                                value={horas[item.id]?.hora_fin || ''}
-                                                onChange={(e) => handleChange(e, item.id)}
-                                                className="border border-gray-300 rounded-md px-2 py-1 w-full focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                            />
-                                        ) : (
-                                            item.hora_fin
-                                        )}
-                                    </td>
-
-                                    <td className="px-6 py-4">
-                                        {editingId === item.id ? (
-                                            <input
-                                                type="time"
-                                                name="almuerzo_inicio"
-                                                value={horas[item.id]?.almuerzo_inicio || ''}
-                                                onChange={(e) => handleChange(e, item.id)}
-                                                className="border border-gray-300 rounded-md px-2 py-1 w-full focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                            />
-                                        ) : (
-                                            item.almuerzo_inicio || "-"
-                                        )}
-                                    </td>
-
-                                    <td className="px-6 py-4">
-                                        {editingId === item.id ? (
-                                            <input
-                                                type="time"
-                                                name="almuerzo_fin"
-                                                value={horas[item.id]?.almuerzo_fin || ''}
-                                                onChange={(e) => handleChange(e, item.id)}
-                                                className="border border-gray-300 rounded-md px-2 py-1 w-full focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                            />
-                                        ) : (
-                                            item.almuerzo_fin || "-"
-                                        )}
-                                    </td>
-
-                                    <td className="px-6 py-4 flex space-x-2">
-                                        {editingId === item.id ? (
-                                            <>
-                                                <button
-                                                    onClick={() => handleSave(item.id)}
-                                                    className="bg-green-500 hover:bg-green-600 text-white px-3 py-1 rounded-md transition"
-                                                >
-                                                    Guardar
-                                                </button>
-                                                <button
-                                                    onClick={handleCancel}
-                                                    className="bg-gray-400 hover:bg-gray-500 text-white px-3 py-1 rounded-md transition"
-                                                >
-                                                    Cancelar
-                                                </button>
-                                            </>
-                                        ) : (
-                                            <button
-                                                onClick={() => handleEdit(item.id)}
-                                                className="bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded-md transition"
-                                            >
-                                                Editar
-                                            </button>
-                                        )}
-                                    </td>
+                    <div className="overflow-x-auto">
+                        <table className="min-w-full bg-white border border-gray-200 rounded-xl shadow-sm">
+                            <thead>
+                                <tr className="bg-gray-100 text-gray-700 text-sm uppercase tracking-wider">
+                                    <th className="px-6 py-3 text-left">Día</th>
+                                    <th className="px-6 py-3 text-left">Hora Inicio</th>
+                                    <th className="px-6 py-3 text-left">Hora Fin</th>
+                                    <th className="px-6 py-3 text-left">Almuerzo Inicio</th>
+                                    <th className="px-6 py-3 text-left">Almuerzo Fin</th>
+                                    <th className="px-6 py-3 text-left">Acciones</th>
                                 </tr>
-                            ))}
-                        </tbody>
-                    </table>
-                </div>
-             )}
+                            </thead>
+
+                            <tbody className="text-gray-700 text-sm">
+                                {agenda.map((item) => (
+                                    <tr key={item.id} className="border-t hover:bg-gray-50 transition">
+                                        <td className="px-6 py-4">{item.dia_semana}</td>
+
+                                        <td className="px-6 py-4">
+                                            {editingId === item.id ? (
+                                                <input
+                                                    type="time"
+                                                    name="hora_inicio"
+                                                    value={horas[item.id]?.hora_inicio || ''}
+                                                    onChange={(e) => handleChange(e, item.id)}
+                                                    className="border border-gray-300 rounded-md px-2 py-1 w-full focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                                />
+                                            ) : (
+                                                item.hora_inicio
+                                            )}
+                                        </td>
+
+                                        <td className="px-6 py-4">
+                                            {editingId === item.id ? (
+                                                <input
+                                                    type="time"
+                                                    name="hora_fin"
+                                                    value={horas[item.id]?.hora_fin || ''}
+                                                    onChange={(e) => handleChange(e, item.id)}
+                                                    className="border border-gray-300 rounded-md px-2 py-1 w-full focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                                />
+                                            ) : (
+                                                item.hora_fin
+                                            )}
+                                        </td>
+
+                                        <td className="px-6 py-4">
+                                            {editingId === item.id ? (
+                                                <input
+                                                    type="time"
+                                                    name="almuerzo_inicio"
+                                                    value={horas[item.id]?.almuerzo_inicio || ''}
+                                                    onChange={(e) => handleChange(e, item.id)}
+                                                    className="border border-gray-300 rounded-md px-2 py-1 w-full focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                                />
+                                            ) : (
+                                                item.almuerzo_inicio || "-"
+                                            )}
+                                        </td>
+
+                                        <td className="px-6 py-4">
+                                            {editingId === item.id ? (
+                                                <input
+                                                    type="time"
+                                                    name="almuerzo_fin"
+                                                    value={horas[item.id]?.almuerzo_fin || ''}
+                                                    onChange={(e) => handleChange(e, item.id)}
+                                                    className="border border-gray-300 rounded-md px-2 py-1 w-full focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                                />
+                                            ) : (
+                                                item.almuerzo_fin || "-"
+                                            )}
+                                        </td>
+
+                                        <td className="px-6 py-4 flex space-x-2">
+                                            {editingId === item.id ? (
+                                                <>
+                                                    <button
+                                                        onClick={() => handleSave(item.id)}
+                                                        className="bg-green-500 hover:bg-green-600 text-white px-3 py-1 rounded-md transition"
+                                                    >
+                                                        Guardar
+                                                    </button>
+                                                    <button
+                                                        onClick={handleCancel}
+                                                        className="bg-gray-400 hover:bg-gray-500 text-white px-3 py-1 rounded-md transition"
+                                                    >
+                                                        Cancelar
+                                                    </button>
+                                                </>
+                                            ) : (
+                                                <button
+                                                    onClick={() => handleEdit(item.id)}
+                                                    className="bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded-md transition"
+                                                >
+                                                    Editar
+                                                </button>
+                                            )}
+                                        </td>
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </table>
+                    </div>
+                )}
             </div>
-           
+
 
         </div>
     );
