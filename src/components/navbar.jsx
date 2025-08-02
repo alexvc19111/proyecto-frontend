@@ -50,51 +50,72 @@ export default function Navbar() {
 
         {/* Logo */}
         <div className="flex gap-x-4 items-center">
+          <Link to='/'>
           <img
             src={logo}
             alt="Logo"
             className={`cursor-pointer transition-transform duration-500 ${open && 'rotate-[360deg]'}`}
           />
+          </Link>
+          
           <h1 className={`text-white font-medium text-xl origin-left transition-all duration-300 ${!open && 'scale-0'}`}>
-            S.A.W
+            S.A.C
           </h1>
         </div>
 
         {/* Menú */}
         <ul className="menu mt-6 space-y-2">
-            {hasRole("medico") && (
+            {hasRole("medico" ) && (
           <li>
-            <a className="flex items-center gap-4 text-white hover:bg-slate-100 hover:text-slate-900 p-2 rounded-md">
+            <Link to='/agenda-medica' className="flex items-center gap-4 text-white hover:bg-slate-100 hover:text-slate-900 p-2 rounded-md">
               <img src={calendario} alt="Agenda" className="w-5 h-5" />
               <span className={`${!open && 'hidden'} transition-all`}>Agenda</span>
-            </a>
+            </Link>
           </li>
         )}
+            {hasRole("medico") && (
           <li>
-            <a className="flex items-center gap-4 text-white hover:bg-slate-100 hover:text-slate-900 p-2 rounded-md">
+            <Link to='/turnos' className="flex items-center gap-4 text-white hover:bg-slate-100 hover:text-slate-900 p-2 rounded-md">
+              <img src={calendario} alt="Agendar cita" className="w-5 h-5" />
+              <span className={`${!open && 'hidden'} transition-all`}>Gestión de turnos</span>
+            </Link>
+          </li>
+          )}
+          {hasRole("recepcionista") && (
+          <li>
+            <Link to='/reserva' className="flex items-center gap-4 text-white hover:bg-slate-100 hover:text-slate-900 p-2 rounded-md">
               <img src={calendario} alt="Agendar cita" className="w-5 h-5" />
               <span className={`${!open && 'hidden'} transition-all`}>Agendar cita</span>
-            </a>
+            </Link>
           </li>
+          )}
           {hasRole("Administrador") && (
           <li>
-            <Link to='/'  className="flex items-center gap-4 text-white hover:bg-slate-100 hover:text-slate-900 p-2 rounded-md">
+            <Link to='/Usuarios'  className="flex items-center gap-4 text-white hover:bg-slate-100 hover:text-slate-900 p-2 rounded-md">
               <img src={user} alt="Gestionar usuarios" className="w-5 h-5" />
               <span className={`${!open && 'hidden'} transition-all`}>Gestionar usuarios</span>
             </Link>
           </li>
            )}
+           {hasRole("Administrador") && (
           <li>
-            <a className="flex items-center gap-4 text-white hover:bg-slate-100 hover:text-slate-900 p-2 rounded-md">
+            <Link to='/Empleados'  className="flex items-center gap-4 text-white hover:bg-slate-100 hover:text-slate-900 p-2 rounded-md">
+              <img src={user} alt="Gestionar Empleados" className="w-5 h-5" />
+              <span className={`${!open && 'hidden'} transition-all`}>Gestionar empleados</span>                                    
+            </Link>
+          </li>
+           )}
+          <li>
+            <Link to='/Pacientes' className="flex items-center gap-4 text-white hover:bg-slate-100 hover:text-slate-900 p-2 rounded-md">
               <img src={user} alt="Gestionar pacientes" className="w-5 h-5" />
               <span className={`${!open && 'hidden'} transition-all`}>Gestionar pacientes</span>
-            </a>
+            </Link>
           </li>
           <li>
-            <a className="flex items-center gap-4 text-white hover:bg-slate-100 hover:text-slate-900 p-2 rounded-md">
-              <img src={user} alt="Perfil pacientes" className="w-5 h-5" />
+            <Link to='/Perfil' className="flex items-center gap-4 text-white hover:bg-slate-100 hover:text-slate-900 p-2 rounded-md">
+              <img src={user} alt="Perfil" className="w-5 h-5" />
               <span className={`${!open && 'hidden'} transition-all`}>Perfil</span>
-            </a>
+            </Link>
           </li>
           <li>
             <button
